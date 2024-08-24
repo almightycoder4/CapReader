@@ -53,9 +53,9 @@ class OCRModel:
         return label[0]
 
 # Example usage
-if __name__ == '__main__':
-    ocr_model = OCRModel()  # Instantiate the class
-    with open('../captcha_datasets/6mfM.png', 'rb') as image_file:
-        image_buffer = image_file.read()
-    result = ocr_model.predict(image_buffer, brightness=11.2, contrast=1.3, sharpness=1.1)  # Example with adjusted values
-    print("Detected Text:", result)
+# if __name__ == '__main__':
+#     ocr_model = OCRModel()  # Instantiate the class
+#     with open('../../../Desktop/DFaqQf.png', 'rb') as image_file:
+#         image_buffer = image_file.read()
+#     result = ocr_model.predict(image_buffer, brightness=1.2, contrast=5.3, sharpness=2.1)  # Example with adjusted values
+#     print("Detected Text:", result)
