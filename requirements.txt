@@ -1,0 +1,6 @@
+pillow
+torchvision
+pyyaml
+pytorch_lightning
+timm
+nltk
