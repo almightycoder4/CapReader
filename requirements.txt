@@ -4,3 +4,4 @@ pyyaml
 pytorch_lightning
 timm
 nltk
+requests

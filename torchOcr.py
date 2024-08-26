@@ -1,12 +1,15 @@
+import os
 import torch
 from torchvision import transforms as T
 from PIL import Image, ImageEnhance
 from io import BytesIO
 
+MODEL_PATH = '/var/task/torch/hub/baudm_parseq_main' if os.path.isfile('/var/task/torch/hub/baudm_parseq_main') else 'torch/hub/baudm_parseq_main'
 class OCRModel:
     def __init__(self):
         # Load the model
-        self.model = torch.hub.load('./torch/hub/baudm_parseq_main', 'parseq', source='local', pretrained=True, trust_repo=True).eval()
+        print(MODEL_PATH)
+        self.model = torch.hub.load(MODEL_PATH, 'parseq', source='local', pretrained=True, trust_repo=True).eval()
 
         # Preprocess transformation
         self._preprocess = T.Compose([
