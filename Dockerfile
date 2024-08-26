@@ -11,12 +11,11 @@ RUN pip install -r requirements.txt
 
 # Copy function code
 COPY main.py ${LAMBDA_TASK_ROOT}/
-COPY app ${LAMBDA_TASK_ROOT}/app/
-COPY models ${LAMBDA_TASK_ROOT}/models/
+COPY torch ${LAMBDA_TASK_ROOT}/torch/
 COPY local_test.py ${LAMBDA_TASK_ROOT}/
 
 # Ensure the model files have correct permissions
-RUN chmod -R 755 ${LAMBDA_TASK_ROOT}/models/
+RUN chmod -R 755 ${LAMBDA_TASK_ROOT}/torch/
 RUN chmod -R 755 ${LAMBDA_TASK_ROOT}
 RUN chmod -R 755 ${LAMBDA_TASK_ROOT}/
 
