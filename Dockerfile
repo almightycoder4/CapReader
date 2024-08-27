@@ -1,5 +1,17 @@
 FROM public.ecr.aws/lambda/python:3.12
 
+# Set the TORCH_HOME environment variable
+ENV TORCH_HOME=/var/task/.torch
+RUN pip install torch pyyaml pytorch_lightning timm nltk
+# Preload the model weights
+RUN python -c "import torch; torch.hub.load('baudm/parseq', 'parseq', pretrained=True)"
+
+# Copy your application code
+COPY . /var/task
+
+# Set the working directory
+WORKDIR /var/task
+
 # Copy requirements.txt
 COPY requirements.txt ${LAMBDA_TASK_ROOT}
 

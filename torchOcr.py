@@ -4,7 +4,7 @@ from torchvision import transforms as T
 from PIL import Image, ImageEnhance
 from io import BytesIO
 
-MODEL_PATH = '/var/task/torch/hub/baudm_parseq_main' if os.path.isfile('/var/task/torch/hub/baudm_parseq_main') else 'torch/hub/baudm_parseq_main'
+MODEL_PATH = '/var/task/torch/hub/baudm_parseq_main'
 class OCRModel:
     def __init__(self):
         # Load the model
@@ -44,7 +44,6 @@ class OCRModel:
 
         # Adjust the image according to user-defined values
         image = self.adjust_image(image, brightness, contrast, sharpness)
-        image.save('adjusted_image.jpg')
         # Preprocess the image
         image = self._preprocess(image).unsqueeze(0)
 
