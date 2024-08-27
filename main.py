@@ -4,6 +4,7 @@ import requests
 from io import BytesIO
 from time import time
 import base64
+import cgi
 
 from torchOcr import OCRModel
 
@@ -37,42 +38,56 @@ def lambda_handler(event, context):
 
         content_type = event['headers'].get('Content-Type', '')
 
+        # Initialize variables
+        img_buffer = None
+        img_url = None
+        brightness = 1.0
+        contrast = 1.0
+        sharpness = 1.0
+
         if 'multipart/form-data' in content_type:
-            # Handle file upload via Postman
-            file_content = event['body']
-            img_buffer = BytesIO(base64.b64decode(file_content))
-            img_url = None  # No URL provided in this case
-            brightness = body.get('brightness', 1.0)
-            contrast = body.get('contrast', 1.0)
-            sharpness = body.get('sharpness', 1.0)
+            # Handle file upload via form-data
+            file_content = base64.b64decode(event['body'])  # Decode the base64 form-data
+            boundary = content_type.split(';')[1].split('=')[1].strip()
+
+            # Parse the form-data
+            environ = {'REQUEST_METHOD': 'POST', 'CONTENT_TYPE': content_type}
+            form_data = cgi.FieldStorage(
+                fp=BytesIO(file_content),
+                environ=environ,
+                keep_blank_values=True
+            )
+            
+            file_item = form_data['file']  # This should match the key name in Postman
+            img_buffer = BytesIO(file_item.file.read())  # Read the image file content
         else:
             # Handle JSON input
             body = json.loads(event.get('body', '{}'))
             img_url = body.get('imgUrl')
-            img_buffer = None
+            base64_img = body.get('base64Image')
             brightness = body.get('brightness', 1.0)
             contrast = body.get('contrast', 1.0)
             sharpness = body.get('sharpness', 1.0)
 
-        if not img_url and not img_buffer:
+            if img_url:
+                img_content = validate_image_url(img_url)
+                img_buffer = io.BytesIO(img_content)
+            elif base64_img:
+                img_buffer = BytesIO(base64.b64decode(base64_img))
+
+        if not img_buffer:
             return {
                 "statusCode": 400,
-                "body": json.dumps({"error": "Either imgUrl or image buffer must be provided"})
+                "body": json.dumps({"error": "Either imgUrl, base64Image, or image buffer must be provided"})
             }
 
-        if img_url:
-            img_content = validate_image_url(img_url)
-            image_buffer = io.BytesIO(img_content)
-        else:
-            image_buffer = img_buffer
-
-        if path == '/captchaSolver':
-            detected_text = ocr_model.predict(image_buffer, brightness, contrast, sharpness)
+        if path == '/captchaSolver' and http_method == 'POST':
+            detected_text, confidenceScore = ocr_model.predict(img_buffer, brightness, contrast, sharpness)
             result_message = "OCR Completed Successfully."
         else:
             return {
                 "statusCode": 404,
-                "body": json.dumps({"error": "Path not found"})
+                "body": json.dumps({"error": "Path not found or Invalid request type."})
             }
 
         end_time = time()
@@ -82,6 +97,7 @@ def lambda_handler(event, context):
             "statusCode": 200,
             "body": json.dumps({
                 "detected_text": detected_text,
+                "confidence_score": confidenceScore,
                 "result": result_message,
                 "execution_time": f"{round(execution_time, 2)} sec",
             })

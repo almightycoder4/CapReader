@@ -6,10 +6,10 @@ event = {
         "Content-Type": "application/json"
     },
     "body": json.dumps({
-        "imgUrl": "https://iduploadbucket.s3.ap-south-1.amazonaws.com/DFaqQf.png",
+        "imgUrl": "https://iduploadbucket.s3.ap-south-1.amazonaws.com/CQMF.png",
         "brightness":1,
-        "contrast":4,
-        "saturation":4
+        "contrast":1,
+        "saturation":1
     }),
     "httpMethod": "POST",
     "isBase64Encoded": False,
