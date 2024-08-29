@@ -4,7 +4,7 @@ from torchvision import transforms as T
 from PIL import Image, ImageEnhance
 from io import BytesIO
 
-MODEL_PATH = '/var/task/torch/hub/baudm_parseq_main'
+MODEL_PATH = '/workspace/CapReader/torch/hub/baudm_parseq_main'
 class OCRModel:
     def __init__(self):
         # Load the model
