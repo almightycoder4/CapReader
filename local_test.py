@@ -1,24 +1,16 @@
 import json
 from main import lambda_handler
 
-base64_img= ""
-
 event = {
     "headers": {
         "Content-Type": "application/json"
     },
-    # "body": json.dumps({
-    #     "imgUrl": "https://iduploadbucket.s3.ap-south-1.amazonaws.com/CQMF.png",
-    #     "brightness":1,
-    #     "contrast":1,
-    #     "saturation":1
-    # }),
     "body": json.dumps({
-           "base64Image": base64_img,
-            "brightness": 1,
-            "contrast": 1,
-            "sharpness": 1
-        }),
+        "imgUrl": "https://iduploadbucket.s3.ap-south-1.amazonaws.com/CQMF.png",
+        "brightness":1,
+        "contrast":1,
+        "saturation":1
+    }),
     "httpMethod": "POST",
     "isBase64Encoded": False,
     "path": "/captchaSolver"
