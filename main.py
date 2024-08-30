@@ -5,9 +5,6 @@ from io import BytesIO
 from time import time
 import base64
 import cgi
-import cv2
-import numpy as np
-import os
 
 from torchOcr import OCRModel
 
@@ -18,46 +15,6 @@ def validate_image_url(img_url):
     if response.headers['Content-Type'] not in ['image/jpeg', 'image/jpg', 'image/png']:
         raise ValueError("Invalid file type")
     return response.content
-
-def enhance_image(img_buffer, brightness, contrast, sharpness):
-    # Convert image buffer to numpy array
-    image_np = np.frombuffer(img_buffer.getvalue(), dtype=np.uint8)
-    
-    # Decode the image using OpenCV
-    img = cv2.imdecode(image_np, cv2.IMREAD_UNCHANGED)
-    
-    # Resize image to 200x50
-    img_resized = cv2.resize(img, (200, 50), interpolation=cv2.INTER_AREA)
-    
-    # Convert to grayscale
-    gray = cv2.cvtColor(img_resized, cv2.COLOR_BGR2GRAY)
-    
-    # Apply thresholding (e.g., Otsu's thresholding)
-    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    
-    # Track if any enhancement is applied
-    enhancement_applied = False
-
-    # Optionally adjust brightness, contrast, and sharpness
-    if brightness != 1.0 or contrast != 1.0:
-        thresh = cv2.convertScaleAbs(thresh, alpha=contrast, beta=brightness)
-        enhancement_applied = True
-    
-    # Sharpness can be adjusted using a kernel
-    if sharpness != 1.0:
-        kernel = np.array([[-1, -1, -1], [-1, 9 * sharpness, -1], [-1, -1, -1]])
-        thresh = cv2.filter2D(thresh, -1, kernel)
-        enhancement_applied = True
-
-    # Save enhanced image locally if any enhancement was applied
-    # if enhancement_applied:
-    #     output_path = 'enhanced_image.png'  # Local path where the image will be saved
-    #     cv2.imwrite(output_path, thresh)
-        print(f"Enhanced image saved to {output_path}")
-
-    # Encode the processed image back to a buffer
-    _, buffer = cv2.imencode('.png', thresh)
-    return BytesIO(buffer)
 
 def lambda_handler(event, context):
     http_method = event['httpMethod']
@@ -125,11 +82,7 @@ def lambda_handler(event, context):
             }
 
         if path == '/captchaSolver' and http_method == 'POST':
-            # Enhance image before OCR
-            enhanced_img_buffer = enhance_image(img_buffer, brightness, contrast, sharpness)
-            
-            # Predict using the OCR model
-            detected_text, confidenceScore = ocr_model.predict(enhanced_img_buffer)
+            detected_text, confidenceScore = ocr_model.predict(img_buffer, brightness, contrast, sharpness)
             result_message = "OCR Completed Successfully."
         else:
             return {
