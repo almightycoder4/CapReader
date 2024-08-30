@@ -53,7 +53,7 @@ def enhance_image(img_buffer, brightness, contrast, sharpness):
     # if enhancement_applied:
     #     output_path = 'enhanced_image.png'  # Local path where the image will be saved
     #     cv2.imwrite(output_path, thresh)
-    #     print(f"Enhanced image saved to {output_path}")
+        print(f"Enhanced image saved to {output_path}")
 
     # Encode the processed image back to a buffer
     _, buffer = cv2.imencode('.png', thresh)
